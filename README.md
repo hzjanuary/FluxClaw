@@ -1,6 +1,6 @@
 <div align="center">
 
-# Flux (Fusion-Jarvis)
+# FluxClaw (Fusion-Jarvis)
 
 **A personal AI Agent on Telegram — Powered by OpenRouter**
 
@@ -120,15 +120,15 @@ TELEGRAM_API_ID=12345678
 TELEGRAM_API_HASH=your_api_hash_here
 
 # Phone number MUST be in international format
-# Example: 0988186931 → drop the leading 0, add +84 → +84988186931
-TELEGRAM_PHONE=+84988186931
+# Example: 0123456789 → drop the leading 0, add +84 → +84123456789
+TELEGRAM_PHONE=+84123456789
 
 OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxxxxx
-DEFAULT_MODEL=google/gemini-2.0-flash-001
+DEFAULT_MODEL=meta-llama/llama-3.3-70b-instruct:free
 ```
 
 > **Phone number format:**
-> `0988186931` → remove leading `0` → prepend `+84` → `+84988186931`
+> `0123456789` → remove leading `0` → prepend `+84` → `+84123456789`
 
 ### Step 3 — Install dependencies
 
@@ -196,12 +196,12 @@ Done. The tool is automatically included in the system prompt and available for 
 | `TELEGRAM_PHONE` | Yes | — | Phone number in `+84...` format |
 | `OPENROUTER_API_KEY` | Yes | — | OpenRouter API Key |
 | `TELEGRAM_OWNER_ID` | No | `0` (public) | Restrict bot to a single user ID |
-| `DEFAULT_MODEL` | No | `google/gemini-2.0-flash-001` | Primary LLM model |
+| `DEFAULT_MODEL` | No | `meta-llama/llama-3.3-70b-instruct:free` | Primary LLM model |
 | `SUMMARIZER_MODEL` | No | `google/gemini-2.0-flash-001` | Memory summarization model |
 | `MAX_TOKENS` | No | `2048` | Maximum response token limit |
 | `SHORT_TERM_LIMIT` | No | `10` | Max messages in short-term memory |
-| `AGENT_NAME` | No | `Fusion-Jarvis` | Agent display name |
-| `SESSION_NAME` | No | `fusion_jarvis_session` | Telethon session filename |
+| `AGENT_NAME` | No | `fluxclaw` | Agent display name |
+| `SESSION_NAME` | No | `fluxclaw_session` | Telethon session filename |
 
 ---
 
