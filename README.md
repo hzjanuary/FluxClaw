@@ -21,6 +21,12 @@
 
 - Conversing naturally in **Vietnamese and English**
 - Automatically **calling tools** (web search, system info, note saving, math, etc.)
+- Using **smart routing** for speed:
+     - **Direct answer** for simple prompts (no tool planning overhead)
+     - **Fast web path** for realtime/news-like questions
+     - **Full ReAct loop** for complex tasks
+- Automatically switching to **fallback models** when the primary model returns `429/404`
+- Tracking **latency metrics** (LLM/tool/total) per chat via `/status latency`
 - Maintaining long-term context via the **Lambda Memory** system (fully async)
 - Supporting **multiple users** with isolated memory per chat
 - **Persisting state** — memory survives bot restarts
@@ -41,7 +47,7 @@ flux/
 └── requirements.txt — Python dependencies
 ```
 
-### Processing Flow (ReAct Loop)
+### Processing Flow (Smart Router + ReAct)
 
 ```
 Message from Telegram
@@ -50,13 +56,21 @@ Message from Telegram
         |
    [brain.py] brain.think()
         |
+   Route by intent:
+     - Direct answer (simple prompts)
+     - Fast web path (realtime/news prompts)
+     - Full ReAct loop (complex prompts)
+        |
    Build prompt: System Prompt + Core Context (LTM) + Short-term history
         |
-   Call LLM (OpenRouter) ----> TOOL_CALL? ----> [tools.py] Execute tool
-                          ^____________________|  Feed result back to LLM
+   Call LLM (OpenRouter, with fallback chain on 429/404)
+        |
+   TOOL_CALL? ----> [tools.py] Execute tool ----> Feed result back to LLM
         |
    (final plain-text answer)
    [memory.py] Update STM → async summarization if full
+        |
+   [brain.py] Record latency metrics (LLM/tool/total, path, model)
         |
    Send reply to Telegram
 ```
@@ -134,6 +148,7 @@ TELEGRAM_BOT_TOKEN=123456789:AAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 OPENROUTER_API_KEY=sk-or-v1-xxxxxxxxxxxx
 DEFAULT_MODEL=meta-llama/llama-3.3-70b-instruct:free
+FALLBACK_MODELS=google/gemini-2.0-flash-001,meta-llama/llama-3.1-8b-instruct:free
 
 # Strongly recommended: set to your Telegram User ID
 TELEGRAM_OWNER_ID=0
@@ -166,6 +181,27 @@ No OTP or phone number required. The bot connects immediately using the Bot Toke
 | `/status` | View memory state (STM count + Core Context preview) |
 | `/status latency` | View real-time latency metrics (LLM/tool/total) |
 | `/reset` | Clear all memory for the current chat |
+
+---
+
+## Performance & Reliability
+
+### 1) Automatic model fallback
+
+When the primary model fails with `429` (rate limit) or `404` (not found), FluxClaw automatically retries with the next model from `FALLBACK_MODELS`.
+
+### 2) Latency observability
+
+Use `/status latency` to inspect:
+
+- Average total latency per turn
+- Average LLM latency and LLM calls/turn
+- Average tool latency and tool calls/turn
+- Last turn details: path, model used, and timing breakdown
+
+### 3) Direct answer mode for simple prompts
+
+For short/simple questions, FluxClaw uses a compact prompt and skips tool planning to reduce token usage and speed up response time.
 
 ---
 
